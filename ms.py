@@ -32,7 +32,6 @@ def chk_around(x,y):
 				pz[x][y]+=1
 
 def gen_puzzle():
-	#16%만큼 지뢰(*)형성
 	for i in range(int(size[0]*size[1]*level)):
 		making[i]='*'
 		global remain
@@ -58,6 +57,33 @@ def prt_answer():
 	for j in range (size[1]):
 		print " - ",
 	print "\n"
+	
+def open_around(x,y):
+	#print "xy: ",x,y
+	chk=[]
+	for i in range(-1,2) :
+		#print "x: ",x+i
+		if (x+i < 0) or (x+i >= size[0]) :
+			#print "Xcon"
+			continue
+		for j in range(-1,2) :
+			#print "y: ",y+j
+			if (y+j < 0) or (y+j >= size[1]) :
+				#print "Ycon"
+				continue
+			if (i==0) and (j==0):
+				#print "It's me"
+				continue
+			if (pz[x+i][y+j]==0) and (ans[x+i][y+j]==' '):
+				#print "reopen"
+				ans[x+i][y+j]=0
+				global remain
+				remain-=1
+				open_around(x+i,y+j)
+				#print "hello"
+			else:
+				guessing(x+i,y+j)
+				#print "there"
 
 def guessing(x,y):
 	if ans[x][y]==' ':
@@ -68,6 +94,8 @@ def guessing(x,y):
 		else:
 			global remain
 			remain-=1
+			if pz[x][y]==0:
+				open_around(x,y)
 			return 1
 	else:
 		return 1
