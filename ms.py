@@ -1,12 +1,4 @@
 # -*- coding:utf-8 -*-
-'''
-깃발상태에서도 위치보여주기 선택가능하게 하고,
-위치보여줄때 깃발상태인지 아닌지 알려줄것
-깃발상태일때 취소가능하게
-2자리수(11,11)이상일때 자릿수 제대로맞추기
-깃발표시다했을때 주변다태워주기
-'''
-
 import random
 from sys import stdout
 
@@ -122,31 +114,58 @@ def guessing(x,y):
 	else: #실수로 다른칸 누른걸 방지, 빈칸아닌칸을 누르면 그냥 무시하고 게임진행(end=1을 반환해서 그냥 게임유지.)
 		return 1
 
-remain=size[0]*size[1]
+
+def done(x,y):
+	end=1
+	for i in range(-1,2) :
+	#continue: out of range를 피하기위해.
+		if (x+i < 0) or (x+i >= size[0]) :
+			continue
+		for j in range(-1,2) :
+			if (y+j < 0) or (y+j >= size[1]) :
+				continue
+			end=guessing(x+i,y+j)
+			if end:
+				break
+		if end:
+			break
+	return end
+
+
+(global)remain=size[0]*size[1]
 gen_puzzle()
 prt_answer(0)
-end=1
-flag=0
+(global)end=1
+(global)flag=0
+
+def gss_flag(ans):
+	gss=input("깃발을 어디에 (ex-0,0, -3:위치보기) : ")
+	if gss<0:
+		prt_answer(gss)
+		return gss_flag(ans)
+	#깃발해제.
+	if ans=='!':
+		ans=' '
+		return -1
+	#빈칸일때만 깃발처리. 실수로 이미열린칸 눌렀을 때를 대비.
+	elif ans==' ':
+		ans='!'
+		return +1
+
 
 while(end):
 	print remain,"칸 남음, ",int(size[0]*size[1]*level)-flag,"개 지뢰남음"
 	gss=input("입력 (ex-0,0 또는 -1:깃발, -3:위치보기) : ")
 	if gss==-1:
-		gss=input("깃발을 어디에 (ex-0,0, -3:위치보기) : ")
-		if gss==-3:
-			prt_answer(gss)
-			gss=input("깃발을 어디에 (ex-0,0, -3:위치보기) : ")
-		#깃발해제.
-		if ans[gss[0]][gss[1]]=='!':
-			ans[gss[0]][gss[1]]=' '
-			flag-=1
-		#빈칸일때만 깃발처리. 실수로 이미열린칸 눌렀을 때를 대비.
-		elif ans[gss[0]][gss[1]]==' ':
-			ans[gss[0]][gss[1]]='!'
-			flag+=1
+		flag+=gss_flag(ans[gss[0]][gss[1]])
+	elif gss==-2:
+		gss=input("어딜 터뜨릴까요 (ex-0,0) : ")
+		end = done(gss[0],gss[1])
 	elif gss==-3:
 		prt_answer(gss)
 	elif (0<=gss[0]<size[0])and(0<=gss[1]<size[1]):
+		end=guessing(gss[0],gss[1])
+	else:
 		end=guessing(gss[0],gss[1])
 	prt_answer(gss)
 	if remain==0:
