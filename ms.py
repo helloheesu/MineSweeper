@@ -1,4 +1,12 @@
 # -*- coding:utf-8 -*-
+'''
+깃발상태에서도 위치보여주기 선택가능하게 하고,
+위치보여줄때 깃발상태인지 아닌지 알려줄것
+깃발상태일때 취소가능하게
+2자리수(11,11)이상일때 자릿수 제대로맞추기
+깃발표시다했을때 주변다태워주기
+'''
+
 import random
 from sys import stdout
 
@@ -52,14 +60,24 @@ def gen_puzzle():
 			if pz[i][j]==0:
 				chk_around(i,j)
 
+def prt_where(mode,ans,i,j):
+	if mode==-3:
+		if ans==' ':
+			print str(i)+','+str(j),
+		else:
+			print ' '+str(ans)+' ',
+	else:
+		print ans,
+
 #화면에 '보여질퍼즐'출력
-def prt_answer():
+def prt_answer(mode):
 	for i in range (size[0]):
 		for j in range (size[1]):
 			print " - ",
 		print "\n"
 		for j in range (size[1]):
-			print "|",ans[i][j],
+			print "|",
+			prt_where(mode,ans[i][j],i,j)
 		print "|"
 	for j in range (size[1]):
 		print " - ",
@@ -106,15 +124,18 @@ def guessing(x,y):
 
 remain=size[0]*size[1]
 gen_puzzle()
-prt_answer()
+prt_answer(0)
 end=1
 flag=0
 
 while(end):
 	print remain,"칸 남음, ",int(size[0]*size[1]*level)-flag,"개 지뢰남음"
-	gss=input("입력 (ex-0,0 또는 -1:깃발) : ")
+	gss=input("입력 (ex-0,0 또는 -1:깃발, -3:위치보기) : ")
 	if gss==-1:
-		gss=input("깃발을 어디에 (ex-0,0) : ")
+		gss=input("깃발을 어디에 (ex-0,0, -3:위치보기) : ")
+		if gss==-3:
+			prt_answer(gss)
+			gss=input("깃발을 어디에 (ex-0,0, -3:위치보기) : ")
 		#깃발해제.
 		if ans[gss[0]][gss[1]]=='!':
 			ans[gss[0]][gss[1]]=' '
@@ -123,9 +144,11 @@ while(end):
 		elif ans[gss[0]][gss[1]]==' ':
 			ans[gss[0]][gss[1]]='!'
 			flag+=1
+	elif gss==-3:
+		prt_answer(gss)
 	elif (0<=gss[0]<size[0])and(0<=gss[1]<size[1]):
 		end=guessing(gss[0],gss[1])
-	prt_answer()
+	prt_answer(gss)
 	if remain==0:
 		print "You Win! :) \n"
 		end=0
