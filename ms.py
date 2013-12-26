@@ -6,23 +6,28 @@ global remain
 
 size=[]
 size=input("지뢰밭의 크기 (ex-20,20) : ")
-level=input("레벨(1,2,3) : ")
+level=input("레벨(1,2,3,4) : ")
 
 if level==1:
-	level=0.10
+	level=0.08
 elif level==2:
-	level=0.25
+	level=0.15
+elif level==3:
+	level=0.20
 else:
-	level=0.40
+	level=0.25
 
 making=[0]*size[0]*size[1] #random을 위한 임시공간
 pz = [] #답
 ans = [] #보여질 퍼즐
+#보여질퍼즐에 빈칸만들기
 for i in range(size[0]) :
 	ans.append([' ']*size[1])
 
+#정답퍼즐에 주변의 지뢰수 확인
 def chk_around(x,y):
 	for i in range(-1,2) :
+		#continue: out of range를 피하기위해.
 		if (x+i < 0) or (x+i >= size[0]) :
 			continue
 		for j in range(-1,2) :
@@ -31,6 +36,7 @@ def chk_around(x,y):
 			if pz[x+i][y+j]=='*':
 				pz[x][y]+=1
 
+#퍼즐생성 : 랜덤으로 지뢰뿌리고, 주변지뢰수적어주고. '남은 지뢰수'확인을 위한 remain++.
 def gen_puzzle():
 	for i in range(int(size[0]*size[1]*level)):
 		making[i]='*'
@@ -46,6 +52,7 @@ def gen_puzzle():
 			if pz[i][j]==0:
 				chk_around(i,j)
 
+#화면에 '보여질퍼즐'출력
 def prt_answer():
 	for i in range (size[0]):
 		for j in range (size[1]):
@@ -57,34 +64,31 @@ def prt_answer():
 	for j in range (size[1]):
 		print " - ",
 	print "\n"
-	
+
+#주변지뢰수가 0일때 열어주기	
 def open_around(x,y):
-	#print "xy: ",x,y
 	chk=[]
 	for i in range(-1,2) :
-		#print "x: ",x+i
+		#continue: out of range를 피하기위해.
 		if (x+i < 0) or (x+i >= size[0]) :
-			#print "Xcon"
 			continue
 		for j in range(-1,2) :
-			#print "y: ",y+j
 			if (y+j < 0) or (y+j >= size[1]) :
-				#print "Ycon"
 				continue
+			#자기자신은 체크건너뜀. 무한루프에 빠진다.
 			if (i==0) and (j==0):
-				#print "It's me"
 				continue
+			#주변지뢰수가 0이고, 보여지는 퍼즐이 빈칸일때 비로소 열어줌. '남은 지뢰수'--.
 			if (pz[x+i][y+j]==0) and (ans[x+i][y+j]==' '):
-				#print "reopen"
 				ans[x+i][y+j]=0
 				global remain
 				remain-=1
+				#재귀함수^^
 				open_around(x+i,y+j)
-				#print "hello"
 			else:
 				guessing(x+i,y+j)
-				#print "there"
 
+#'클릭'했을때 일어나는일.
 def guessing(x,y):
 	if ans[x][y]==' ':
 		ans[x][y]=pz[x][y]
@@ -97,7 +101,7 @@ def guessing(x,y):
 			if pz[x][y]==0:
 				open_around(x,y)
 			return 1
-	else:
+	else: #실수로 다른칸 누른걸 방지, 빈칸아닌칸을 누르면 그냥 무시하고 게임진행(end=1을 반환해서 그냥 게임유지.)
 		return 1
 
 remain=size[0]*size[1]
@@ -105,18 +109,21 @@ gen_puzzle()
 prt_answer()
 end=1
 flag=0
+
 while(end):
 	print remain,"칸 남음, ",int(size[0]*size[1]*level)-flag,"개 지뢰남음"
 	gss=input("입력 (ex-0,0 또는 -1:깃발) : ")
 	if gss==-1:
 		gss=input("깃발을 어디에 (ex-0,0) : ")
+		#깃발해제.
 		if ans[gss[0]][gss[1]]=='!':
 			ans[gss[0]][gss[1]]=' '
 			flag-=1
+		#빈칸일때만 깃발처리. 실수로 이미열린칸 눌렀을 때를 대비.
 		elif ans[gss[0]][gss[1]]==' ':
 			ans[gss[0]][gss[1]]='!'
 			flag+=1
-	else:
+	elif (0<=gss[0]<size[0])and(0<=gss[1]<size[1]):
 		end=guessing(gss[0],gss[1])
 	prt_answer()
 	if remain==0:
