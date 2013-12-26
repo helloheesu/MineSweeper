@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 import random
-from sys import stdout
 
 global remain
 
@@ -62,7 +61,7 @@ def prt_where(mode,ans,i,j):
 		print ans,
 
 #화면에 '보여질퍼즐'출력
-def prt_answer(mode):
+def prt_answer(mode):											#!! mode가 숫자네. c처럼 enum있었으면.
 	for i in range (size[0]):
 		for j in range (size[1]):
 			print " - ",
@@ -132,24 +131,26 @@ def done(x,y):
 	return end
 
 
-(global)remain=size[0]*size[1]
+remain=size[0]*size[1]
 gen_puzzle()
 prt_answer(0)
-(global)end=1
-(global)flag=0
+end=1
+flag=0
 
-def gss_flag(ans):
-	gss=input("깃발을 어디에 (ex-0,0, -3:위치보기) : ")
-	if gss<0:
+def gss_flag():
+	gss=input("깃발을 어디에 (ex-0,0, -1:깃발 모드 취소, -3:위치보기) : ")	#!! 깃발 취소라니.. 바로 누르는 gui에서는 안 나오겠고, 나눠서 클릭해야 할 모바일에서는 나오겠네. 모바일도 이것 때문에 불편하더라.
+	if gss==-1:					#깃발 취소도 가능하고,
+		return 0
+	elif gss==-3:				#위치보기도 여러번 가능하고.
 		prt_answer(gss)
-		return gss_flag(ans)
+		return gss_flag()
 	#깃발해제.
-	if ans=='!':
-		ans=' '
+	if ans[gss[0]][gss[1]]=='!':
+		ans[gss[0]][gss[1]]=' '
 		return -1
 	#빈칸일때만 깃발처리. 실수로 이미열린칸 눌렀을 때를 대비.
-	elif ans==' ':
-		ans='!'
+	elif ans[gss[0]][gss[1]]==' ':
+		ans[gss[0]][gss[1]]='!'
 		return +1
 
 
@@ -157,16 +158,20 @@ while(end):
 	print remain,"칸 남음, ",int(size[0]*size[1]*level)-flag,"개 지뢰남음"
 	gss=input("입력 (ex-0,0 또는 -1:깃발, -3:위치보기) : ")
 	if gss==-1:
-		flag+=gss_flag(ans[gss[0]][gss[1]])
+		flag += gss_flag()
+		"""
 	elif gss==-2:
 		gss=input("어딜 터뜨릴까요 (ex-0,0) : ")
 		end = done(gss[0],gss[1])
+		"""
 	elif gss==-3:
 		prt_answer(gss)
 	elif (0<=gss[0]<size[0])and(0<=gss[1]<size[1]):
 		end=guessing(gss[0],gss[1])
-	else:
+		"""
+	else: #뭐야 else면 범위 밖을 접근하니까 위험하잖아
 		end=guessing(gss[0],gss[1])
+		"""
 	prt_answer(gss)
 	if remain==0:
 		print "You Win! :) \n"
