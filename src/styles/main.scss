@@ -1,0 +1,28 @@
+/*! HTML5 Boilerplate v5.0 | MIT License | http://h5bp.com/ */
+
+@import 'color-and-size';
+@import 'normalize';
+@import 'mine';
+
+.wrapper {
+    $width-ratio: 0.9;
+    @extend %clearfix;
+    width: 100% * $width-ratio;
+    margin: 0 5%;
+    @include screen-large {
+        width: $large-width * $width-ratio;
+        margin: 0 auto;
+    }
+}
+
+.main {
+    padding: 30px 0;
+}
+
+.header-container {
+    background: $primary-color;
+    border-bottom: 20px solid $primary-color-dark;
+    @include screen-mid {
+                box-shadow: 0 5px 10px #aaa;
+    }
+}

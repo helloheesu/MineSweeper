@@ -10,3 +10,12 @@ goal:
 - 배운 c++언어 사용해서 (네이티브)윈도우 기반 게임 만들기.
 - java 배워서 크로스플랫폼 프로그램 만들기.
 - objective-c 배워서 맥용으로 포팅하기.
+
+
+# TODO
+* new game
+* flag mark/clear
+* done
+* remain mines
+* 연속 승
+* records - 연속 승, 크기는 랜덤인 걸로-.
